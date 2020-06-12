@@ -1,28 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from "react-router-dom";
 import { Card, Container, Button, Row, Col, Pagination } from 'react-bootstrap';
+import useLocalstorage from "@rooks/use-localstorage";
 import { IoIosArrowForward } from 'react-icons/io';
-import SynthSpecficationBlock from './SynthSpecificationBlock'
+import SynthSpecficationBlock from './SynthSpecificationBlock';
 
 const Synths = () => {
-    const [masterRef, setMasterRef] = useState(null);
+    const [masterRef, setMasterRef] = useLocalstorage("masterRef", null);
+    let params = useParams();
+    const history = useHistory();
     const [data, setData] = useState(null);
     const [totalPages, setTotalPages] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1);
     const baseRef = 'https://synth.prismic.io/api/v2/documents/search?ref=';
     const synthRef = encodeURI('[[at(document.type, "synth")]]');
     const searchOrder = encodeURI('[my.synth.manufacturer]');
     const pageSize = 6;
-    const completeUrl = `${baseRef}${masterRef}&q=${synthRef}&orderings=${searchOrder}&pageSize=${pageSize}&page=${currentPage}#format=json`;
-    const history = useHistory();
+    const completeUrl = `${baseRef}${masterRef}&q=${synthRef}&orderings=${searchOrder}&pageSize=${pageSize}&page=${params.page}#format=json`;
+
+    const handleCurrentPageUpdate = (event) => {
+        let page = event.target.getAttribute('data-page-index');
+        history.push({
+            pathname: `/synths/${page}`
+        });
+    }
 
     let items = [];
+    for (let number = 1; number <= totalPages; number++) {
+        items.push(
+            <Pagination.Item key={number} active={number === +params.page} onClick={(event) => handleCurrentPageUpdate(event)} data-page-index={number}>
+                {number}
+            </Pagination.Item>,
+        );
+    }
 
     useEffect(() => {
-        fetch("https://synth.prismic.io/api")
-            .then((res) => res.json())
-            .then(res => setMasterRef(res.refs[0].ref))
-            .catch((error) => console.log(error));
+        if (masterRef === null) {
+            fetch("https://synth.prismic.io/api")
+                .then((res) => res.json())
+                .then(res => setMasterRef(res.refs[0].ref))
+                .catch((error) => console.log(error));
+        }
     }, []);
 
     useEffect(() => {
@@ -33,13 +50,12 @@ const Synths = () => {
 
     useEffect(() => {
         setTimeout(() => {
-            console.log(totalPages)
-            // setPaginationDetail();
+            getSynthData();
         }, 50)
-    }, [totalPages]);
+    }, [params]);
 
     const getSynthData = () => {
-        if (masterRef) {
+        if (masterRef !== null) {
             fetch(completeUrl)
                 .then((res) => res.json())
                 .then(res => { setData(res.results); setTotalPages(res.total_pages) })
@@ -50,7 +66,7 @@ const Synths = () => {
     const handleDetailClick = (slugs, id) => {
         const slug = slugs[0];
         history.push({
-            pathname: `/synths/${slug}`
+            pathname: `/synth/${slug}`
         });
     }
 
@@ -89,6 +105,11 @@ const Synths = () => {
                         })
                     }
 
+                </Row>
+                <Row>
+                    <Col>
+                        <Pagination size="sm">{items}</Pagination>
+                    </Col>
                 </Row>
             </Container>
         </>

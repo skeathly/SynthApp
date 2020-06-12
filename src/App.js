@@ -19,10 +19,12 @@ function App() {
       <Navigation />
 
       <Switch>
-        <Route exact path="/synths">
+
+        <Route path="/synths/:page">
           <Synths />
         </Route>
-        <Route path="/synths/:slug">
+
+        <Route path="/synth/:slug">
           <SynthDetail />
         </Route>
         <Route path="/manufacturers">

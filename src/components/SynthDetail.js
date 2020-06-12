@@ -1,30 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { IoIosArrowBack } from 'react-icons/io';
-import {
-    useHistory,
-    useParams
-} from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { Card, Container, Button, Row, Col } from 'react-bootstrap';
+import useLocalstorage from "@rooks/use-localstorage";
 import SynthSpecificationBlockLong from './SynthSpecificationBlockLong';
 
 const SynthDetail = (props) => {
-    const [masterRef, setMasterRef] = useState(null);
+    const [masterRef, setMasterRef, removeMasterRef] = useLocalstorage("masterRef");
     let { slug } = useParams();
     const history = useHistory();
     const baseRef = 'https://synth.prismic.io/api/v2/documents/search?ref=';
     const [synth, setSynth] = useState(null);
 
     useEffect(() => {
-        fetch("https://synth.prismic.io/api")
-            .then((res) => res.json())
-            .then(res => setMasterRef(res.refs[0].ref))
-            .catch((error) => console.log(error));
+        if (masterRef === null) {
+            fetch("https://synth.prismic.io/api")
+                .then((res) => res.json())
+                .then(res => setMasterRef(res.refs[0].ref))
+                .catch((error) => console.log(error));
+        }
     }, []);
 
     useEffect(() => {
         setTimeout(() => {
             getSynthData();
-        }, 100)
+        }, 50)
     }, [masterRef]);
 
     const getSynthData = () => {

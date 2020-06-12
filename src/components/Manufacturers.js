@@ -1,23 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
+import useLocalstorage from "@rooks/use-localstorage";
 import { Link } from 'react-router-dom';
 
 const Manufacturers = () => {
+    const [masterRef, setMasterRef] = useLocalstorage("masterRef", null);
     const baseRef = 'https://synth.prismic.io/api/v2/documents/search?ref=';
     const [manufacturer, setManufacturer] = useState(null);
-    const [masterRef, setMasterRef] = useState(null);
 
     useEffect(() => {
-        fetch("https://synth.prismic.io/api")
-            .then((res) => res.json())
-            .then(res => setMasterRef(res.refs[0].ref))
-            .catch((error) => console.log(error));
+        if (masterRef === null) {
+            fetch("https://synth.prismic.io/api")
+                .then((res) => res.json())
+                .then(res => setMasterRef(res.refs[0].ref))
+                .catch((error) => console.log(error));
+        }
     }, []);
 
     useEffect(() => {
         setTimeout(() => {
             getManufacturers();
-        }, 100)
+        }, 50)
     }, [masterRef]);
 
     const getManufacturers = () => {
