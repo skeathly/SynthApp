@@ -1,0 +1,26 @@
+@import "~bootstrap/scss/bootstrap";
+
+/* add variables */
+
+body {
+    background-color: #EEE;
+}
+
+dl.specs {
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 14px;
+  }
+  dt {
+    width: 50%;
+  }
+  dd {
+    margin-left: auto;
+    width: 50%;
+  }
+
+.footer {
+    background-color: #343a40;
+    color: #AAA;
+    padding: 12px 0;
+}
