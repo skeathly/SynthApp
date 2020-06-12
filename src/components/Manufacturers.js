@@ -1,35 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import Prismic from 'prismic-javascript';
 import { Container, Row, Col } from 'react-bootstrap';
-import useLocalstorage from "@rooks/use-localstorage";
-import { Link } from 'react-router-dom';
 
 const Manufacturers = () => {
-    const [masterRef, setMasterRef] = useLocalstorage("masterRef", null);
-    const baseRef = 'https://synth.prismic.io/api/v2/documents/search?ref=';
     const [manufacturer, setManufacturer] = useState(null);
+    const apiEndpoint = 'https://synth.prismic.io/api/v2'
+    const client = Prismic.client(apiEndpoint)
 
     useEffect(() => {
-        if (masterRef === null) {
-            fetch("https://synth.prismic.io/api")
-                .then((res) => res.json())
-                .then(res => setMasterRef(res.refs[0].ref))
-                .catch((error) => console.log(error));
-        }
+        client.query(
+            [Prismic.Predicates.at('document.type', 'manufacturer')],
+            { orderings: '[my.manufacturer.name]' }
+        ).then(response => {
+            setManufacturer(response.results);
+        })
     }, []);
-
-    useEffect(() => {
-        setTimeout(() => {
-            getManufacturers();
-        }, 50)
-    }, [masterRef]);
-
-    const getManufacturers = () => {
-        if (masterRef) {
-            fetch(`${baseRef}${masterRef}&q=%5B%5Bat(document.type%2C+"manufacturer")%5D%5D&orderings=%5Bmy.manufacturer.name%5D#format=json`)
-                .then((res) => res.json())
-                .then(res => setManufacturer(res.results))
-        }
-    }
 
     return (
         <>

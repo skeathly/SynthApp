@@ -1,39 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import Prismic from 'prismic-javascript';
 import { IoIosArrowBack } from 'react-icons/io';
 import { useHistory, useParams } from "react-router-dom";
 import { Card, Container, Button, Row, Col } from 'react-bootstrap';
-import useLocalstorage from "@rooks/use-localstorage";
 import SynthSpecificationBlockLong from './SynthSpecificationBlockLong';
 
+
 const SynthDetail = (props) => {
-    const [masterRef, setMasterRef, removeMasterRef] = useLocalstorage("masterRef");
     let { slug } = useParams();
     const history = useHistory();
-    const baseRef = 'https://synth.prismic.io/api/v2/documents/search?ref=';
     const [synth, setSynth] = useState(null);
+    const apiEndpoint = 'https://synth.prismic.io/api/v2';
+    const client = Prismic.client(apiEndpoint);
 
     useEffect(() => {
-        if (masterRef === null) {
-            fetch("https://synth.prismic.io/api")
-                .then((res) => res.json())
-                .then(res => setMasterRef(res.refs[0].ref))
-                .catch((error) => console.log(error));
-        }
+        client.query(
+            [
+                Prismic.Predicates.at('document.type', 'synth'),
+                Prismic.Predicates.at('my.synth.uid', slug)
+            ],
+        ).then(response => {
+            setSynth(response.results[0].data);
+        })
     }, []);
-
-    useEffect(() => {
-        setTimeout(() => {
-            getSynthData();
-        }, 50)
-    }, [masterRef]);
-
-    const getSynthData = () => {
-        if (masterRef) {
-            fetch(`${baseRef}${masterRef}&q=%5B%5Bat(my.synth.uid%2C+"${slug}")%5D%5D#format=json`)
-                .then((res) => res.json())
-                .then(res => setSynth(res.results[0].data))
-        }
-    }
 
     const handleReturnClick = () => {
         history.goBack();
@@ -59,11 +48,11 @@ const SynthDetail = (props) => {
                                 {
                                     synth && <>
                                         <Row>
-                                            <Col>
+                                            <Col xs={12} md={6}>
                                                 <Card.Title>{synth.manufacturer} {synth.name}</Card.Title>
                                                 <img src={synth.image.url} alt={synth.image.alt} className="img-fluid" />
                                             </Col>
-                                            <Col>
+                                            <Col xs={12} md={6}>
                                                 <SynthSpecificationBlockLong synth={synth} />
                                             </Col>
                                         </Row>

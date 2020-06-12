@@ -1,17 +1,20 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { IoIosCheckmarkCircle } from 'react-icons/io';
+import { IoIosCheckmarkCircle, IoIosLink } from 'react-icons/io';
 
 const SynthSpecificationBlockLong = (props) => {
-    const { manufacturer, polyphony, oscpervoice, keyboard, arpeggiator, sequencer, soundenginegroup, waveformgroup, filtersgroup, effectsgroup } = props.synth;
+    const { manufacturer, manufacturerweb, polyphony, oscpervoice, keyboard, arpeggiator,
+        sequencer, soundenginegroup, waveformgroup, filtersgroup, effectsgroup } = props.synth;
+
     return (
         <>
             <h3 style={{ fontSize: '18px' }}>Specs</h3>
             <dl className="specs">
                 <dt>Manufacturer:</dt>
-                <dd>{manufacturer}</dd>
-
+                <dd>{manufacturer}
+                    {manufacturerweb && <a href={manufacturerweb.url} target="_blank" rel="noopener noreferrer" className="ml-2"><IoIosLink /></a>}
+                </dd>
                 <dt>Sound Engine:</dt>
                 <dd>
                     {
@@ -25,6 +28,9 @@ const SynthSpecificationBlockLong = (props) => {
 
                 <dt>Polyphony:</dt>
                 <dd>{polyphony === 1 ? <span>Monophonic</span> : polyphony}</dd>
+
+                <dt>Osc Per Voice:</dt>
+                <dd>{oscpervoice}</dd>
 
                 <dt>Keyboard:</dt>
                 <dd>{keyboard < 1 ? <span>None</span> : <span>{keyboard} keys</span>}</dd>
