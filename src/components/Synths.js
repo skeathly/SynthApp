@@ -13,7 +13,7 @@ const Synths = () => {
     const [totalPages, setTotalPages] = useState(null);
     const baseRef = 'https://synth.prismic.io/api/v2/documents/search?ref=';
     const synthRef = encodeURI('[[at(document.type, "synth")]]');
-    const searchOrder = encodeURI('[my.synth.manufacturer]');
+    const searchOrder = encodeURI('[my.synth.manufacturer, my.synth.name]');
     const pageSize = 6;
     const completeUrl = `${baseRef}${masterRef}&q=${synthRef}&orderings=${searchOrder}&pageSize=${pageSize}&page=${params.page}#format=json`;
 
